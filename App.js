@@ -12,6 +12,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Librería para íconos
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 
 // Splash Screen
 function SplashScreen({ navigation }) {
@@ -185,33 +187,75 @@ const stylesDetail = StyleSheet.create({
 });
 
 // Settings Screen
-function SettingsScreen() {
-  const [nombre, setNombre] = useState("");
-  const [email, setEmail] = useState("");
-  const [foto, setFoto] = useState("https://via.placeholder.com/150");
+function SettingsScreen({ navigation }) {
+  const [perfil, setPerfil] = useState({
+    nombre: '',
+    apellido: '',
+    correo: '',
+    telefono: '',
+    imagen: null,
+  });
 
-  function guardarPerfil() {
-    alert(`Perfil guardado:\nNombre: ${nombre}\nEmail: ${email}`);
-  }
-
+  // Cargar perfil cuando se abre la pantalla
+  useEffect(() => {
+    const cargarPerfil = async () => {
+      try {
+        const datosGuardados = await AsyncStorage.getItem('perfil');
+        if (datosGuardados) {
+          setPerfil(JSON.parse(datosGuardados));
+        }
+      } catch (error) {
+        console.error("Error al cargar el perfil:", error);
+      }
+    };
+  
+    const focusListener = navigation.addListener('focus', cargarPerfil);
+    return focusListener;
+  }, [navigation]);
+  
   return (
     <View style={stylesSettings.container}>
-      <Text style={stylesSettings.title}>Configuración del Perfil</Text>
-      <Image source={{ uri: foto }} style={stylesSettings.image} />
-      <TextInput
-        style={stylesSettings.input}
-        placeholder="Nombre"
-        value={nombre}
-        onChangeText={setNombre}
-      />
-      <TextInput
-        style={stylesSettings.input}
-        placeholder="Correo Electrónico"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
-      <Button title="Guardar" onPress={guardarPerfil} color="#1DB954" />
+      <View style={stylesSettings.profileContainer}>
+        {perfil.imagen ? (
+          <Image source={{ uri: perfil.imagen }} style={stylesSettings.profileImage} />
+        ) : (
+          <Text>📷 No hay imagen</Text>
+        )}
+        <View style={stylesSettings.profileInfo}>
+          <Text style={stylesSettings.text}>Nombre:   {perfil.nombre}</Text>
+          <Text style={stylesSettings.text}>Apellido: {perfil.apellido}</Text>
+          <Text style={stylesSettings.text}>Correo:   {perfil.correo}</Text>
+          <Text style={stylesSettings.text}>Teléfono: {perfil.telefono}</Text>
+        </View>
+      </View>
+  
+      <Button title="Configurar Perfil" onPress={() => navigation.navigate('ConfigPerfil')} />
+
+      {/* Línea separadora */}
+      <View style={stylesSettings.line} />
+
+      {/* Nueva sección de botones */}
+      <View style={stylesSettings.buttonSection}>
+        <TouchableOpacity style={stylesSettings.optionButton} onPress={() => navigation.navigate('ConfigPerfil')}>
+          <Ionicons name="settings-outline" size={24} color="#1DB954" />
+          <Text style={stylesSettings.optionText}>Configuraciones</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={stylesSettings.optionButton}>
+          <Ionicons name="call-outline" size={24} color="#1DB954" />
+          <Text style={stylesSettings.optionText}>Contacto</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={stylesSettings.optionButton}>
+          <Ionicons name="information-circle-outline" size={24} color="#1DB954" />
+          <Text style={stylesSettings.optionText}>Acerca de Nosotros</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={stylesSettings.optionButton}>
+          <Ionicons name="log-out-outline" size={24} color="#1DB954" />
+          <Text style={stylesSettings.optionText}>Cambiar Cuenta</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -221,28 +265,152 @@ const stylesSettings = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#ffffff",
+    alignItems: "center", // Centra todo el contenido en la pantalla
+    justifyContent: "flex-start", // Alinea en la parte superior
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
+
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',  // Alinea verticalmente los elementos
     marginBottom: 20,
-    color: "#1DB954",
   },
-  image: {
-    width: 100,
-    height: 100,
+  
+  profileImage: {
+    width: 220,
+    height: 220,
     borderRadius: 50,
     marginBottom: 20,
-    alignSelf: "center",
+    marginRight: 20,
   },
-  input: {
-    padding: 10,
+  text: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  line: {
+    width: "100%",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    marginVertical: 20,
+  },
+  buttonSection: {
+    width: "100%",
+  },
+  optionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
     marginBottom: 10,
+    width: "100%",
+    backgroundColor: "#f9f9f9",
+  },
+  optionText: {
+    fontSize: 16,
+    marginLeft: 10,
+    color: "#333",
+  },
+  text: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    marginBottom: 10,
+    width: "100%",
+    backgroundColor: "#f9f9f9",
   },
 });
+
+// Configuración de perfil
+function ConfigPerfilScreen({ navigation }) {
+  const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [telefono, setTelefono] = useState('');
+  const [imagen, setImagen] = useState(null);
+
+  // Cargar datos guardados
+  useEffect(() => {
+    const cargarDatos = async () => {
+      const datosGuardados = await AsyncStorage.getItem('perfil');
+      if (datosGuardados) {
+        const perfil = JSON.parse(datosGuardados);
+        setNombre(perfil.nombre);
+        setApellido(perfil.apellido);
+        setCorreo(perfil.correo);
+        setTelefono(perfil.telefono);
+        setImagen(perfil.imagen);
+        
+      }
+    };
+    cargarDatos();
+  }, []);
+
+  // Seleccionar Imagen desde la PC
+  const seleccionarImagen = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+  });
+
+  if (!result.canceled) {
+    // Asignar la URI de la imagen seleccionada al estado
+    setImagen(result.assets[0].uri);
+  }
+};
+
+  // Guardar perfil
+  const guardarPerfil = async () => {
+    const perfil = { nombre, apellido, correo, telefono, imagen };
+    await AsyncStorage.setItem('perfil', JSON.stringify(perfil));
+    alert('Perfil guardado correctamente');
+    navigation.goBack(); // Regresar a SettingsScreen
+  };
+
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <TouchableOpacity onPress={seleccionarImagen}>
+        {imagen ? (
+          <Image source={{ uri: imagen }} style={{ width: 230, height: 230, borderRadius: 70 }} />
+        ) : (
+          <View style={{ width: 250, height: 250, borderRadius: 50, backgroundColor: '#ccc', justifyContent: 'center', alignItems: 'center' }}>
+            <Text>📷 Seleccionar Imagen</Text>
+          </View>
+          
+        )}
+         {/* Ícono permanente en la parte inferior */}
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          bottom: 5,
+          left: '5%',
+          transform: [{ translateX: -20 }], // Centra el ícono
+          backgroundColor: '#1DB954',
+          borderRadius: 50,
+          padding: 7,
+        }}
+        onPress={seleccionarImagen}
+      >
+        <Ionicons name="camera-outline" size={30} color="white" />
+      </TouchableOpacity>
+      </TouchableOpacity>
+
+      <TextInput placeholder="Nombre(s)" value={nombre} onChangeText={setNombre} style={{ flexDirection: "row",alignItems: "center",padding: 15,borderWidth: 1,borderColor: "#ccc",borderRadius: 8,marginBottom: 10,width: "100%",marginTop: 15,fontWeight: 'bold',backgroundColor: "#f9f9f9", }} />
+      <TextInput placeholder="Apellido(s)" value={apellido} onChangeText={setApellido} style={{ flexDirection: "row",alignItems: "center",padding: 15,borderWidth: 1,borderColor: "#ccc",borderRadius: 8,marginBottom: 10,width: "100%",marginTop: 15,backgroundColor: "#f9f9f9",fontWeight: 'bold', }} />
+      <TextInput placeholder="Correo Electronico" value={correo} onChangeText={setCorreo} keyboardType="email-address" style={{ flexDirection: "row",alignItems: "center",padding: 15,borderWidth: 1,borderColor: "#ccc",borderRadius: 8,marginBottom: 10,width: "100%",marginTop: 15,backgroundColor: "#f9f9f9", fontWeight: 'bold', }} />
+      <TextInput placeholder="Teléfono de Contacto" value={telefono} onChangeText={setTelefono} keyboardType="phone-pad" style={{ flexDirection: "row",alignItems: "center",padding: 15,borderWidth: 1,borderColor: "#ccc",borderRadius: 8,marginBottom: 10,width: "100%",marginTop: 15,backgroundColor: "#f9f9f9", fontWeight: 'bold', }} />
+
+      <Button title="Guardar" onPress={guardarPerfil} />
+
+      
+    </View>
+  );
+}
 
 // Navegación principal con ícono de usuario
 const Stack = createStackNavigator();
@@ -265,7 +433,7 @@ export default function App() {
               <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
                 <Ionicons
                   name="person-circle-outline"
-                  size={30}
+                  size={24}
                   color="#1DB954"
                   style={{ marginRight: 10 }}
                 />
@@ -281,10 +449,14 @@ export default function App() {
         <Stack.Screen
           name="Settings"
           component={SettingsScreen}
-          options={{ title: "Configuración" }}
+          options={{ title: "Atras" }}
+        />
+        <Stack.Screen
+          name="ConfigPerfil"
+          component={ConfigPerfilScreen}
+          options={{ title: " Atras" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
