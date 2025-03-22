@@ -43,4 +43,6 @@ Esto iniciará la aplicación en el navegador y permitirá interactuar con la AP
 Andres Eduardo Navidad Flores NF220677
 Derek Marcelo Monge Aguilar   MA230691
 Kenneth Gabriel Monge Aguilar MA230693
-Abner Ismael Rivera Leiva     RL
+Abner Ismael Rivera Leiva     RL233297
+Moises Alexander Lara Guevara LG220949
+Juan Diego Peña Viva PV230210
