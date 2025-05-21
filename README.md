@@ -1,3 +1,9 @@
+#Integrantes del Proyecto:
+Andres Eduardo Navidad Flores NF220677
+Derek Marcelo Monge Aguilar   MA230691
+Kenneth Gabriel Monge Aguilar MA230693
+Abner Ismael Rivera Leiva     RL233297
+
 #DPSCatedraReactNative
 
 
@@ -29,16 +35,44 @@ npm install -g yarn
 npm install react-native-permissions
 npx pod-install
 npm install @react-native-async-storage/async-storage
-npm audit fix
 
     Una vez instaladas las dependencias, ejecuta el siguiente comando para iniciar el servidor de desarrollo:
 
 npm run web
-
 #Esto iniciará la aplicación en el navegador y permitirá interactuar con la API.
 
-#Integrantes del Proyecto:
-Andres Eduardo Navidad Flores NF220677
-Derek Marcelo Monge Aguilar   MA230691
-Kenneth Gabriel Monge Aguilar MA230693
-Abner Ismael Rivera Leiva     RL233297
+
+*-*-**-*-*-*-* Segunda Fase *-*-**-*-*-*-* 
+
+##  Funcionalidades implementadas
+
+- **Búsqueda de canciones** por nombre
+- **Guardar y eliminar canciones favoritas** con almacenamiento persistente (`AsyncStorage`)
+- **Gestión de perfil de usuario**
+- **Carga de imagen de perfil** desde cámara o galería (`expo-image-picker`)
+- **Persistencia del perfil** con `AsyncStorage`
+
+## Uso de la app!
+1. clona repositorio:
+
+git clone https://github.com/KennethMonge808/DPSCatedraReactNative.git
+cd DPSCatedraReactNative
+
+2. Instala las dependencias
+ 
+npm install
+
+3. Inicia el servidor de desarrollo
+
+npx expo start
+
+## Librerias:
+
+Librería	                                    Uso principal
+react-native	                            Base del desarrollo móvil
+expo	                                    Framework para apps React Native
+expo-av	                                    Reproducción de audio
+expo-image-picker	                        Selección de imágenes desde galería o cámara
+@react-native-async-storage/async-storage	Almacenamiento local persistente
+@react-navigation/native + stack	        Navegación entre pantallas
+@expo/vector-icons	                        Iconos en botones y menús
