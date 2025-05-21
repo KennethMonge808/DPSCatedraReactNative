@@ -71,9 +71,9 @@ export default function SongDetailScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', padding: 20 },
+  container: { flex: 1, alignItems: 'center', padding: 20, backgroundColor: '#121212'},
   image: { width: 200, height: 200, marginBottom: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center' },
-  artist: { fontSize: 18, color: '#666', marginBottom: 20 },
+  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', color: '#FFFF' },
+  artist: { fontSize: 18, color: '#FFFF', marginBottom: 20 },
   buttonContainer: { marginTop: 20, width: '100%' },
 });
