@@ -52,7 +52,7 @@ function SettingsScreen({ navigation }) {
         {perfil.imagen ? (
           <Image source={{ uri: perfil.imagen }} style={styles.profileImage} />
         ) : (
-          <Text>📷 No hay imagen</Text>
+          <Text style={{ color: '#1DB954' }}>📷 No hay imagen</Text>
         )}
         <View style={styles.profileInfo}>
           <Text style={styles.text}>Nombre: {perfil.nombre}</Text>
@@ -65,25 +65,6 @@ function SettingsScreen({ navigation }) {
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ConfigPerfil')}>
         <Text style={styles.buttonText}>Configurar Perfil</Text>
       </TouchableOpacity>
-
-      <View style={styles.line} />
-
-      <View style={styles.buttonSection}>
-        <TouchableOpacity style={styles.optionButton}>
-          <Ionicons name="call-outline" size={24} color="#1DB954" />
-          <Text style={styles.optionText}>Contacto</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.optionButton}>
-          <Ionicons name="information-circle-outline" size={24} color="#1DB954" />
-          <Text style={styles.optionText}>Acerca de Nosotros</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.optionButton}>
-          <Ionicons name="log-out-outline" size={24} color="#1DB954" />
-          <Text style={styles.optionText}>Cerrar Sesión</Text>
-        </TouchableOpacity>
-      </View>
     </Animated.View>
   );
 }
@@ -119,13 +100,38 @@ function ConfigPerfilScreen({ navigation }) {
   }, []);
 
   const seleccionarImagen = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
+    const opciones = ['Cámara', 'Galería', 'Cancelar'];
+    const respuesta = await new Promise((resolve) => {
+      Alert.alert('Seleccionar Imagen', '¿Desde dónde deseas elegir la imagen?', [
+        { text: 'Cámara', onPress: () => resolve('camara') },
+        { text: 'Galería', onPress: () => resolve('galeria') },
+        { text: 'Cancelar', style: 'cancel', onPress: () => resolve(null) },
+      ]);
     });
-    if (!result.canceled) {
-      setImagen(result.assets[0].uri);
+
+    if (respuesta === 'camara') {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permiso denegado', 'No tienes permiso para usar la cámara');
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+      if (!result.canceled) {
+        setImagen(result.assets[0].uri);
+      }
+    } else if (respuesta === 'galeria') {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
+      if (!result.canceled) {
+        setImagen(result.assets[0].uri);
+      }
     }
   };
 
@@ -150,34 +156,39 @@ function ConfigPerfilScreen({ navigation }) {
           <Ionicons name="camera-outline" size={30} color="white" />
         </TouchableOpacity>
       </TouchableOpacity>
-
       <TextInput
         placeholder="Nombre(s)"
+        placeholderTextColor="#888"
         value={nombre}
         onChangeText={setNombre}
         style={styles.input}
       />
+
       <TextInput
         placeholder="Apellido(s)"
+        placeholderTextColor="#888"
         value={apellido}
         onChangeText={setApellido}
         style={styles.input}
       />
+
       <TextInput
         placeholder="Correo Electrónico"
+        placeholderTextColor="#888"
         value={correo}
         onChangeText={setCorreo}
         keyboardType="email-address"
         style={styles.input}
       />
+
       <TextInput
         placeholder="Teléfono"
+        placeholderTextColor="#888"
         value={telefono}
         onChangeText={setTelefono}
         keyboardType="phone-pad"
         style={styles.input}
       />
-
       <TouchableOpacity style={styles.button} onPress={guardarPerfil}>
         <Text style={styles.buttonText}>Guardar</Text>
       </TouchableOpacity>
@@ -190,7 +201,22 @@ const Stack = createStackNavigator();
 
 export default function ProfileScreen() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: 'black',
+          
+        },
+        headerTintColor: '#1DB954',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+
+        },
+        contentStyle: {
+          backgroundColor: 'black',
+        },
+      }}
+    >
       <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Perfil' }} />
       <Stack.Screen name="ConfigPerfil" component={ConfigPerfilScreen} options={{ title: 'Editar Perfil' }} />
     </Stack.Navigator>
@@ -210,7 +236,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingBottom: 20,
     padding: 20,
-    backgroundColor: "1DB954",
+    backgroundColor: '#121212',
   },
   profileContainer: {
     flexDirection: 'row',
@@ -220,7 +246,7 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 220,
     height: 220,
-    borderRadius: 50,
+    borderRadius: 110,
     marginBottom: 20,
     marginRight: 20,
   },
@@ -249,7 +275,7 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 8,
     marginBottom: 10,
-    backgroundColor: "#black",
+    backgroundColor: "#000",
   },
   optionText: {
     fontSize: 16,
@@ -268,19 +294,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
+
   input: {
     padding: 15,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
     marginBottom: 10,
-    backgroundColor: "#black",
+    backgroundColor: "#000",
     color: "#1DB954",
   },
+
   imagePlaceholder: {
     width: 250,
     height: 250,
-    borderRadius: 50,
+    borderRadius: 125,
     backgroundColor: '#ccc',
     justifyContent: 'center',
     alignItems: 'center',
