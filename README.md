@@ -11,11 +11,12 @@
 
 ##Instrucciones de instalación y ejecución
 
-    #Descargar el proyecto
-        Clona el repositorio o descarga el código fuente.
-        Accede a la carpeta raíz del proyecto desde la terminal o el símbolo del sistema:
+#Descargar el proyecto
 
-    cd nombre-de-la-carpeta
+    Clona el repositorio o descarga el código fuente.
+    Accede a la carpeta raíz del proyecto desde la terminal o el símbolo del sistema:
+
+cd nombre-de-la-carpeta
 
 #Requisitos previos
 
@@ -23,26 +24,21 @@
 
 #Instalación de dependencias
 
-    Ejecuta el siguiente comando para instalar Expo:
-
 npm install expo
-
-Luego, instala Yarn de manera global:
-
 npm install -g yarn
-
-Ejecución de la aplicación
+npm install react-native-permissions
+npx pod-install
+npm install @react-native-async-storage/async-storage
+npm audit fix
 
     Una vez instaladas las dependencias, ejecuta el siguiente comando para iniciar el servidor de desarrollo:
 
 npm run web
 
-Esto iniciará la aplicación en el navegador y permitirá interactuar con la API.
+#Esto iniciará la aplicación en el navegador y permitirá interactuar con la API.
 
 #Integrantes del Proyecto:
 Andres Eduardo Navidad Flores NF220677
 Derek Marcelo Monge Aguilar   MA230691
 Kenneth Gabriel Monge Aguilar MA230693
 Abner Ismael Rivera Leiva     RL233297
-Moises Alexander Lara Guevara LG220949
-Juan Diego Peña Viva PV230210
